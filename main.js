@@ -234,6 +234,11 @@
   const btn = document.getElementById('formSubmitBtn');
   if (!btn) return;
 
+  /* Apne backend ka URL yahan daalo.
+     Local testing: http://localhost:5000
+     Deploy karne ke baad: apne backend ka live URL (e.g. https://your-api.onrender.com) */
+  const BACKEND_URL = 'http://localhost:5000';
+
   btn.addEventListener('click', () => {
     /* Basic empty-field validation */
     const form   = document.getElementById('contactForm');
@@ -252,24 +257,52 @@
 
     if (!allFilled) return;
 
-    /* Simulate async send */
+    /* Collect field values */
+    const [firstNameEl, lastNameEl, emailEl, subjectEl] = form.querySelectorAll('input');
+    const messageEl = form.querySelector('textarea');
+
+    const payload = {
+      firstName: firstNameEl.value.trim(),
+      lastName:  lastNameEl.value.trim(),
+      email:     emailEl.value.trim(),
+      subject:   subjectEl.value.trim(),
+      message:   messageEl.value.trim(),
+    };
+
     btn.textContent = 'Sending…';
     btn.disabled    = true;
 
-    setTimeout(() => {
-      btn.textContent              = '✓ Message Sent!';
-      btn.style.background         = '#4cffb0';
-      btn.style.color              = '#0a0a0f';
-
-      /* Reset after 3 s */
-      setTimeout(() => {
-        btn.textContent      = 'Send Message →';
-        btn.style.background = '';
-        btn.style.color      = '';
-        btn.disabled         = false;
-        inputs.forEach((input) => (input.value = ''));
-      }, 3000);
-    }, 1400);
+    fetch(`${BACKEND_URL}/api/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          btn.textContent      = '✓ Message Sent!';
+          btn.style.background = '#4cffb0';
+          btn.style.color      = '#0a0a0f';
+        } else {
+          btn.textContent      = '✕ Failed. Try again';
+          btn.style.background = '#ff5050';
+          btn.style.color      = '#ffffff';
+        }
+      })
+      .catch(() => {
+        btn.textContent      = '✕ Failed. Try again';
+        btn.style.background = '#ff5050';
+        btn.style.color      = '#ffffff';
+      })
+      .finally(() => {
+        setTimeout(() => {
+          btn.textContent      = 'Send Message →';
+          btn.style.background = '';
+          btn.style.color      = '';
+          btn.disabled         = false;
+          inputs.forEach((input) => (input.value = ''));
+        }, 3000);
+      });
   });
 })();
 

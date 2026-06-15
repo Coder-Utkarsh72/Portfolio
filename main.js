@@ -237,7 +237,7 @@
   /* Apne backend ka URL yahan daalo.
      Local testing: http://localhost:5000
      Deploy karne ke baad: apne backend ka live URL (e.g. https://your-api.onrender.com) */
-  const BACKEND_URL = 'http://localhost:5000';
+  const BACKEND_URL = 'https://portfolio-backend-qfeo.onrender.com';
 
   btn.addEventListener('click', () => {
     /* Basic empty-field validation */
